@@ -1,0 +1,127 @@
+﻿<button type="button" id="btnGetList" class="btn btn-outline-primary">Kişi Listesi</button>
+<button type="button" id="btnGetById" class="btn btn-outline-success">Kişi Getir</button>
+<button type="button" id="btnAdd" class="btn btn-outline-info">Kişi Ekle</button>
+<button type="button" id="btnDelete" class="btn btn-outline-danger">Kişi Sil</button>
+<button type="button" id="btnUpdate" class="btn btn-outline-warning">Kişi Güncelle</button>
+<div id="kisiList"></div>
+<div id="getKisi"></div>
+<div><input type="text" id="kisiId" placeholder="Id Giriniz" class="form-control" /></div>
+<br />
+<div class="mt-8">
+	<input type="text" id="txtKisiName" placeholder="İsim Giriniz" class="form-control" />
+	<input type="text" id="txtKisiLastname" placeholder="Soyisim Giriniz" class="form-control" />
+</div>
+<br />
+<div><input type="text" id="txtId" placeholder="Silinecek Kişinin Id'sini Giriniz" class="form-control" /></div>
+<br />
+<div class="mt-8">
+	<input type="text" id="updId" placeholder="Güncellenecek Kişinin İd'sini Giriniz" class="form-control" />
+	<input type="text" id="updAd" placeholder="İsim Giriniz" class="form-control" />
+	<input type="text" id="updSoyad" placeholder="Soyisim Giriniz" class="form-control" />
+</div>
+@section Scripts
+{
+	<script>
+		//Kişi Listele
+		$('#btnGetList').click(function () {
+			$.ajax({
+				type:"get",
+				url:"Kisi/Index",
+				contentType:"text/plain",
+				dataType:"Json",
+				success: function (data) {
+					console.log(data);
+					let tablehtml = `<table><tr><th>Id</th><th>Ad</th><th>Soyad</th></tr>`;
+					$.each(data, function (i, item) {
+						tablehtml += `<tr><td>${item.id}</td><td>${item.ad}</td><td>${item.soyad}</td></tr>`
+					})
+					tablehtml += "</table>";
+					$("#kisiList").html(tablehtml);
+				},
+				error: function (exception) {
+					alert(exception);
+				}
+			});
+		})
+
+		//Kişi getirme
+		$('#btnGetById').click(function () {
+			let id = $('#kisiId').val();
+			$.ajax({
+				type: "get",
+				url: "Kisi/GetKisi",
+				data: { uid: id },
+				dataType: "Json",
+				success: function (data) {
+					let kisi = JSON.parse(data);
+					let getValue = `<table class"table table-striped"><tr><th>Id</th><th>Ad</th><th>Soyad</th></tr><tr><td>${kisi.ID}</td><td>${kisi.Ad}</td><td>${kisi.Soyad}</td></tr></table>`
+					$('#getKisi').html(getValue);
+				},
+				error: function (error) {
+					alert("hata oldu");
+				}
+			});
+		})
+
+		//Kişi ekleme
+		$('#btnAdd').click(function () {
+			let kisi = {
+				Ad: $('#txtKisiName').val(),
+				Soyad: $('#txtKisiLastname').val()
+			};
+			$.ajax({
+				type: "post",
+				url: "Kisi/Ekle",
+				data:kisi,
+				dataType:"Json",
+				success:function(data){
+					let result = JSON.parse(data);
+					alert("Ekleme işlemi başarılı.");
+				},
+				error:function(exception)
+				{
+					alert(exception);
+				}
+			});
+		})
+
+		//Kişi Silme
+		$('#btnDelete').click(function(){
+			let id = $('#txtId').val();
+			$.ajax({
+				type:"get",
+				url:"Kisi/Sil/"+id,
+				dataType:"Json",
+				success: function (data) {
+					alert("Silme İşlemi Başarılı.");
+				},
+				error: function (error) {
+					alert(error);
+				}
+			});
+		})
+
+		//Kişi Güncelle
+		$('#btnUpdate').click(function () {
+			
+			let kisi = {
+				ID: $('#updId').val(),
+				Ad: $('#updAd').val(),
+				Soyad: $('#updSoyad').val()
+			};
+			$.ajax({
+				type: "post",
+				url: "Kisi/Guncelle",
+				data: kisi,
+				dataType: "Json",
+				success: function (data) {
+					let result = JSON.parse(data);
+					alert("Güncelleme işlemi başarılı.");
+				},
+				error: function (exception) {
+					alert(exception);
+				}
+			});
+		})
+	</script>
+}
